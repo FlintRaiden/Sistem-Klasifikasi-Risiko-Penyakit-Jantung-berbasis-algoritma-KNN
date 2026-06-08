@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}HeartGuard KNN – Beranda{% endblock %}
+
+{% block content %}
+
+<!-- ══ Hero Section ══════════════════════════════════════════════════════════ -->
+<section class="page-hero text-center">
+  <div class="container py-2">
+    <div class="mb-3">
+      <i class="bi bi-heart-pulse-fill" style="font-size:3.5rem; filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));"></i>
+    </div>
+    <h1 class="display-5 fw-bold mb-2">HeartGuard KNN</h1>
+    <p class="lead mb-4" style="max-width:600px; margin:0 auto;">
+      Sistem Klasifikasi Risiko Penyakit Jantung
+      berbasis algoritma <strong>K-Nearest Neighbors (KNN)</strong>
+    </p>
+    <a href="{{ url_for('predict') }}" class="btn btn-light btn-lg fw-bold px-5 shadow">
+      <i class="bi bi-clipboard2-pulse me-2"></i>Mulai Klasifikasi
+    </a>
+  </div>
+</section>
+
+<!-- ══ Statistik Model ════════════════════════════════════════════════════════ -->
+<section class="py-4 bg-white border-bottom">
+  <div class="container">
+    <div class="row g-3 text-center justify-content-center">
+      <div class="col-6 col-md-3">
+        <div class="stat-badge d-inline-block">
+          <i class="bi bi-diagram-3 me-1"></i>
+          Algoritma: K-NN
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-badge d-inline-block">
+          <i class="bi bi-bullseye me-1"></i>
+          K Optimal: {{ meta.best_k }}
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-badge d-inline-block">
+          <i class="bi bi-check2-circle me-1"></i>
+          Akurasi: {{ meta.accuracy }}%
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-badge d-inline-block">
+          <i class="bi bi-database me-1"></i>
+          Data Train: {{ meta.n_train }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Tentang Aplikasi ═══════════════════════════════════════════════════════ -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <!-- Kiri: teks penjelasan -->
+      <div class="col-lg-6">
+        <h2 class="fw-bold mb-3" style="color: var(--hg-red-dark);">
+          <i class="bi bi-info-circle-fill me-2"></i>Tentang Aplikasi
+        </h2>
+        <p class="text-muted">
+          <strong>HeartGuard KNN</strong> adalah aplikasi web yang menggunakan
+          algoritma <em>K-Nearest Neighbors (KNN)</em> untuk mengklasifikasikan
+          risiko penyakit jantung berdasarkan 13 parameter klinis pasien.
+        </p>
+        <p class="text-muted">
+          Model dilatih menggunakan <strong>dataset Heart Disease UCI</strong>
+          yang berisi 1.025 data pasien. Proses preprocessing menggunakan
+          <em>StandardScaler</em> karena KNN sangat sensitif terhadap skala fitur.
+          Nilai K optimal ditentukan menggunakan <em>Elbow Method</em> dengan
+          5-fold cross-validation.
+        </p>
+        <a href="{{ url_for('predict') }}" class="btn btn-hg-primary mt-2">
+          <i class="bi bi-arrow-right-circle me-2"></i>Coba Sekarang
+        </a>
+      </div>
+
+      <!-- Kanan: cara kerja KNN -->
+      <div class="col-lg-6">
+        <div class="card card-hg">
+          <div class="card-header py-3">
+            <i class="bi bi-lightbulb-fill me-2"></i>Cara Kerja KNN
+          </div>
+          <div class="card-body p-4">
+            <ol class="list-group list-group-numbered list-group-flush">
+              <li class="list-group-item d-flex align-items-start border-0 px-0 py-2">
+                <div>
+                  <strong>Tentukan nilai K</strong><br>
+                  <small class="text-muted">Jumlah tetangga terdekat yang akan digunakan untuk voting.</small>
+                </div>
+              </li>
+              <li class="list-group-item d-flex align-items-start border-0 px-0 py-2">
+                <div>
+                  <strong>Hitung jarak Euclidean</strong><br>
+                  <small class="text-muted">Hitung jarak data baru ke semua data latih (setelah scaling).</small>
+                </div>
+              </li>
+              <li class="list-group-item d-flex align-items-start border-0 px-0 py-2">
+                <div>
+                  <strong>Pilih K tetangga terdekat</strong><br>
+                  <small class="text-muted">Urutkan jarak dan ambil K data dengan jarak terkecil.</small>
+                </div>
+              </li>
+              <li class="list-group-item d-flex align-items-start border-0 px-0 py-2">
+                <div>
+                  <strong>Voting mayoritas</strong><br>
+                  <small class="text-muted">Kelas terbanyak dari K tetangga menjadi hasil prediksi.</small>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Fitur Utama ════════════════════════════════════════════════════════════ -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5" style="color: var(--hg-red-dark);">
+      Fitur Aplikasi
+    </h2>
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-md-4">
+        <div class="card card-hg h-100 text-center p-4">
+          <div class="icon-circle icon-circle-red mx-auto mb-3">
+            <i class="bi bi-ui-checks-grid"></i>
+          </div>
+          <h5 class="fw-bold">Form Input Interaktif</h5>
+          <p class="text-muted small">
+            Masukkan 13 parameter klinis pasien melalui form yang mudah digunakan
+            dengan dropdown dan input numerik yang intuitif.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-hg h-100 text-center p-4">
+          <div class="icon-circle icon-circle-red mx-auto mb-3">
+            <i class="bi bi-bar-chart-fill"></i>
+          </div>
+          <h5 class="fw-bold">Visualisasi Probabilitas</h5>
+          <p class="text-muted small">
+            Hasil prediksi dilengkapi visualisasi progress bar probabilitas
+            "Sehat" vs "Sakit Jantung" dari voting K tetangga.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-hg h-100 text-center p-4">
+          <div class="icon-circle icon-circle-red mx-auto mb-3">
+            <i class="bi bi-file-earmark-medical"></i>
+          </div>
+          <h5 class="fw-bold">Ringkasan Data Pasien</h5>
+          <p class="text-muted small">
+            Halaman hasil menampilkan ringkasan lengkap data yang diinput
+            beserta label yang mudah dibaca (bukan kode angka).
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ════════════════════════════════════════════════════════════════════ -->
+<section class="py-5" style="background: var(--hg-red-bg);">
+  <div class="container text-center">
+    <h3 class="fw-bold mb-2" style="color: var(--hg-red-dark);">
+      Siap memulai klasifikasi?
+    </h3>
+    <p class="text-muted mb-4">Masukkan data pasien dan dapatkan hasil prediksi dalam hitungan detik.</p>
+    <a href="{{ url_for('predict') }}" class="btn btn-hg-primary btn-lg">
+      <i class="bi bi-clipboard2-pulse me-2"></i>Mulai Klasifikasi
+    </a>
+  </div>
+</section>
+
+{% endblock %}

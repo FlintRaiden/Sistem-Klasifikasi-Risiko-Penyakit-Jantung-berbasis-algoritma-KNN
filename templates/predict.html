@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}HeartGuard KNN – Form Klasifikasi{% endblock %}
+
+{% block content %}
+
+<!-- ══ Page Header ═══════════════════════════════════════════════════════════ -->
+<section class="page-hero text-center py-4">
+  <div class="container">
+    <h1 class="h2 fw-bold mb-1">
+      <i class="bi bi-clipboard2-pulse me-2"></i>Form Data Pasien
+    </h1>
+    <p class="mb-0 opacity-75">Isi semua field di bawah untuk mendapatkan hasil klasifikasi KNN</p>
+  </div>
+</section>
+
+<!-- ══ Alert Error (jika ada) ════════════════════════════════════════════════ -->
+{% if error %}
+<div class="container mt-3">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ error }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+</div>
+{% endif %}
+
+<!-- ══ Form Input ═════════════════════════════════════════════════════════════ -->
+<section class="py-4">
+  <div class="container" style="max-width: 860px;">
+    <div class="card card-hg">
+      <div class="card-header py-3">
+        <i class="bi bi-person-vcard me-2"></i>Data Klinis Pasien
+      </div>
+      <div class="card-body p-4">
+
+        <form method="POST" action="{{ url_for('predict') }}" id="predictForm" novalidate>
+
+          <!-- ─── Bagian 1: Data Demografis ─────────────────────────────── -->
+          <p class="section-divider">
+            <i class="bi bi-person me-1"></i>Data Demografis
+          </p>
+          <div class="row g-3 mb-4">
+
+            <!-- Usia -->
+            <div class="col-md-6">
+              <label for="age" class="form-label">
+                Usia <span class="text-danger">*</span>
+                <i class="bi bi-info-circle text-muted ms-1"
+                   data-bs-toggle="tooltip" title="Usia pasien dalam tahun"></i>
+              </label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="age" name="age"
+                       min="1" max="120" placeholder="cth: 52" required />
+                <span class="input-group-text">tahun</span>
+              </div>
+            </div>
+
+            <!-- Jenis Kelamin -->
+            <div class="col-md-6">
+              <label for="sex" class="form-label">
+                Jenis Kelamin <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="sex" name="sex" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="1">Laki-laki</option>
+                <option value="0">Perempuan</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ─── Bagian 2: Gejala Kardiovaskular ───────────────────────── -->
+          <p class="section-divider">
+            <i class="bi bi-heart-pulse me-1"></i>Gejala Kardiovaskular
+          </p>
+          <div class="row g-3 mb-4">
+
+            <!-- Tipe Nyeri Dada -->
+            <div class="col-md-6">
+              <label for="cp" class="form-label">
+                Tipe Nyeri Dada (CP) <span class="text-danger">*</span>
+                <i class="bi bi-info-circle text-muted ms-1"
+                   data-bs-toggle="tooltip"
+                   title="0=Asimptomatik, 1=Angina Tipikal, 2=Angina Atipikal, 3=Nyeri Non-Anginal"></i>
+              </label>
+              <select class="form-select" id="cp" name="cp" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0 – Asimptomatik</option>
+                <option value="1">1 – Angina Tipikal</option>
+                <option value="2">2 – Angina Atipikal</option>
+                <option value="3">3 – Nyeri Non-Anginal</option>
+              </select>
+            </div>
+
+            <!-- Angina akibat Olahraga -->
+            <div class="col-md-6">
+              <label for="exang" class="form-label">
+                Angina akibat Olahraga (Exang) <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="exang" name="exang" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">Tidak</option>
+                <option value="1">Ya</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ─── Bagian 3: Hasil Pemeriksaan ───────────────────────────── -->
+          <p class="section-divider">
+            <i class="bi bi-activity me-1"></i>Hasil Pemeriksaan Klinis
+          </p>
+          <div class="row g-3 mb-4">
+
+            <!-- Tekanan Darah Istirahat -->
+            <div class="col-md-6">
+              <label for="trestbps" class="form-label">
+                Tekanan Darah Istirahat <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="trestbps" name="trestbps"
+                       min="50" max="250" placeholder="cth: 125" required />
+                <span class="input-group-text">mmHg</span>
+              </div>
+            </div>
+
+            <!-- Kolesterol Serum -->
+            <div class="col-md-6">
+              <label for="chol" class="form-label">
+                Kolesterol Serum <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="chol" name="chol"
+                       min="50" max="600" placeholder="cth: 212" required />
+                <span class="input-group-text">mg/dl</span>
+              </div>
+            </div>
+
+            <!-- Gula Darah Puasa -->
+            <div class="col-md-6">
+              <label for="fbs" class="form-label">
+                Gula Darah Puasa (FBS) <span class="text-danger">*</span>
+                <i class="bi bi-info-circle text-muted ms-1"
+                   data-bs-toggle="tooltip" title="Apakah gula darah puasa > 120 mg/dl?"></i>
+              </label>
+              <select class="form-select" id="fbs" name="fbs" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0 – ≤ 120 mg/dl (Normal)</option>
+                <option value="1">1 – &gt; 120 mg/dl (Tinggi)</option>
+              </select>
+            </div>
+
+            <!-- Hasil EKG Istirahat -->
+            <div class="col-md-6">
+              <label for="restecg" class="form-label">
+                Hasil EKG Istirahat <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="restecg" name="restecg" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0 – Normal</option>
+                <option value="1">1 – Abnormalitas Gelombang ST-T</option>
+                <option value="2">2 – Hipertrofi Ventrikel Kiri</option>
+              </select>
+            </div>
+
+            <!-- Detak Jantung Maksimum -->
+            <div class="col-md-6">
+              <label for="thalach" class="form-label">
+                Detak Jantung Maksimum <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="thalach" name="thalach"
+                       min="50" max="250" placeholder="cth: 168" required />
+                <span class="input-group-text">bpm</span>
+              </div>
+            </div>
+
+            <!-- Depresi ST (Oldpeak) -->
+            <div class="col-md-6">
+              <label for="oldpeak" class="form-label">
+                Depresi Segmen ST (Oldpeak) <span class="text-danger">*</span>
+                <i class="bi bi-info-circle text-muted ms-1"
+                   data-bs-toggle="tooltip"
+                   title="Depresi ST saat olahraga relatif terhadap istirahat"></i>
+              </label>
+              <input type="number" class="form-control" id="oldpeak" name="oldpeak"
+                     min="0" max="10" step="0.1" placeholder="cth: 1.0" required />
+            </div>
+          </div>
+
+          <!-- ─── Bagian 4: Data Kardiovaskular Lanjutan ────────────────── -->
+          <p class="section-divider">
+            <i class="bi bi-lungs me-1"></i>Data Kardiovaskular Lanjutan
+          </p>
+          <div class="row g-3 mb-4">
+
+            <!-- Kemiringan Segmen ST -->
+            <div class="col-md-4">
+              <label for="slope" class="form-label">
+                Kemiringan Segmen ST <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="slope" name="slope" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0 – Menurun</option>
+                <option value="1">1 – Datar</option>
+                <option value="2">2 – Naik</option>
+              </select>
+            </div>
+
+            <!-- Jumlah Pembuluh Darah Utama -->
+            <div class="col-md-4">
+              <label for="ca" class="form-label">
+                Pembuluh Darah Utama (CA) <span class="text-danger">*</span>
+                <i class="bi bi-info-circle text-muted ms-1"
+                   data-bs-toggle="tooltip"
+                   title="Jumlah pembuluh darah utama (0–4) yang terlihat di fluoroskopi"></i>
+              </label>
+              <select class="form-select" id="ca" name="ca" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+
+            <!-- Thalassemia -->
+            <div class="col-md-4">
+              <label for="thal" class="form-label">
+                Hasil Thalassemia <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="thal" name="thal" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option value="0">0 – Normal</option>
+                <option value="1">1 – Cacat Tetap</option>
+                <option value="2">2 – Cacat Reversibel</option>
+                <option value="3">3 – Tidak Diketahui</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ─── Tombol Submit ──────────────────────────────────────────── -->
+          <hr class="my-4" />
+          <div class="d-flex gap-3 justify-content-end">
+            <button type="reset" class="btn btn-hg-outline">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Form
+            </button>
+            <button type="submit" class="btn btn-hg-primary" id="submitBtn">
+              <i class="bi bi-search me-2"></i>Klasifikasikan
+            </button>
+          </div>
+
+        </form><!-- /form -->
+      </div><!-- /card-body -->
+    </div><!-- /card -->
+
+    <!-- Catatan kecil -->
+    <p class="text-muted text-center mt-3 small">
+      <i class="bi bi-shield-check me-1"></i>
+      Data yang Anda masukkan hanya diproses di server dan tidak disimpan secara permanen.
+    </p>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // ── Aktifkan semua tooltip Bootstrap ──
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+  });
+
+  // ── Validasi form sebelum submit ──
+  document.getElementById('predictForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    const form = this;
+
+    // Cek validitas HTML5
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    // Tampilkan loading state
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

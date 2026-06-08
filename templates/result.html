@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}HeartGuard KNN – Hasil Prediksi{% endblock %}
+
+{% block content %}
+
+<!-- ══ Page Header ═══════════════════════════════════════════════════════════ -->
+<section class="page-hero text-center py-4">
+  <div class="container">
+    <h1 class="h2 fw-bold mb-1">
+      <i class="bi bi-file-earmark-medical me-2"></i>Hasil Klasifikasi KNN
+    </h1>
+    <p class="mb-0 opacity-75">Analisis risiko penyakit jantung berdasarkan data yang diinput</p>
+  </div>
+</section>
+
+<section class="py-4">
+  <div class="container" style="max-width: 860px;">
+
+    <!-- ══ Kartu Hasil Utama ══════════════════════════════════════════════ -->
+    <div class="card card-hg mb-4">
+      <div class="card-body p-4">
+        <div class="row align-items-center g-3">
+
+          <!-- Ikon & Label Prediksi -->
+          <div class="col-auto text-center">
+            {% if result.prediction == 1 %}
+              <div class="icon-circle mx-auto" style="width:80px;height:80px;font-size:2.2rem;
+                          background:var(--hg-red-bg); color:var(--hg-red);">
+                <i class="bi bi-heart-pulse-fill"></i>
+              </div>
+            {% else %}
+              <div class="icon-circle mx-auto" style="width:80px;height:80px;font-size:2.2rem;
+                          background:#EAFAF1; color:#27AE60;">
+                <i class="bi bi-heart-fill"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col">
+            <p class="text-muted small mb-1 fw-semibold text-uppercase letter-spacing-1">
+              Hasil Prediksi Model KNN
+            </p>
+            <h2 class="fw-bold mb-1
+              {% if result.prediction == 1 %}text-danger{% else %}text-success{% endif %}">
+              {{ result.label }}
+            </h2>
+            <span class="badge rounded-pill px-3 py-2
+              {% if result.prediction == 1 %}bg-danger{% else %}bg-success{% endif %}">
+              {% if result.prediction == 1 %}
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>Risiko Tinggi
+              {% else %}
+                <i class="bi bi-check-circle-fill me-1"></i>Risiko Rendah
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Visualisasi Probabilitas ═══════════════════════════════════════ -->
+    <div class="card card-hg mb-4">
+      <div class="card-header py-3">
+        <i class="bi bi-bar-chart-fill me-2"></i>Distribusi Probabilitas (Voting K Tetangga)
+      </div>
+      <div class="card-body p-4">
+        <p class="text-muted small mb-3">
+          Persentase di bawah mencerminkan proporsi voting dari
+          <strong>{{ "{:.0f}".format(result.prob_sehat + result.prob_sakit) }}%</strong>
+          total K tetangga terdekat yang diprediksi.
+        </p>
+
+        <!-- Sehat -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="fw-semibold text-success">
+              <i class="bi bi-heart-fill me-1"></i>Sehat
+            </span>
+            <strong class="text-success">{{ result.prob_sehat }}%</strong>
+          </div>
+          <div class="progress progress-hg" style="height:22px; border-radius:8px;">
+            <div class="progress-bar bg-success" role="progressbar"
+                 style="width: {{ result.prob_sehat }}%; border-radius:8px;"
+                 aria-valuenow="{{ result.prob_sehat }}" aria-valuemin="0" aria-valuemax="100">
+              {% if result.prob_sehat > 8 %}{{ result.prob_sehat }}%{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sakit Jantung -->
+        <div class="mb-2">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="fw-semibold text-danger">
+              <i class="bi bi-heart-pulse-fill me-1"></i>Terindikasi Sakit Jantung
+            </span>
+            <strong class="text-danger">{{ result.prob_sakit }}%</strong>
+          </div>
+          <div class="progress progress-hg" style="height:22px; border-radius:8px;">
+            <div class="progress-bar bg-danger" role="progressbar"
+                 style="width: {{ result.prob_sakit }}%; border-radius:8px;"
+                 aria-valuenow="{{ result.prob_sakit }}" aria-valuemin="0" aria-valuemax="100">
+              {% if result.prob_sakit > 8 %}{{ result.prob_sakit }}%{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <p class="text-muted small mt-3 mb-0">
+          <i class="bi bi-info-circle me-1"></i>
+          Probabilitas dihitung dari proporsi voting K tetangga terdekat
+          menggunakan <code>predict_proba()</code> scikit-learn.
+        </p>
+      </div>
+    </div>
+
+    <!-- ══ Ringkasan Data Pasien ══════════════════════════════════════════ -->
+    <div class="card card-hg mb-4">
+      <div class="card-header py-3">
+        <i class="bi bi-person-vcard me-2"></i>Ringkasan Data yang Diinput
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4" style="width:50%">Parameter</th>
+                <th>Nilai</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for param, value in result.input_summary.items() %}
+              <tr>
+                <td class="ps-4 text-muted small fw-semibold">{{ param }}</td>
+                <td class="fw-semibold">{{ value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Catatan & Tombol Aksi ══════════════════════════════════════════ -->
+    <div class="card card-hg border-warning mb-4" style="border:2px solid #F39C12 !important;">
+      <div class="card-body p-3">
+        <p class="mb-0 small">
+          <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+          <strong>Catatan Penting:</strong>
+          Hasil klasifikasi ini bersifat indikatif dan dihasilkan oleh model
+          machine learning berbasis data historis. Hasil ini <strong>tidak dapat
+          menggantikan diagnosis dokter</strong>. Segera konsultasikan dengan
+          tenaga medis profesional untuk pemeriksaan lebih lanjut.
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ url_for('predict') }}" class="btn btn-hg-primary">
+        <i class="bi bi-arrow-repeat me-2"></i>Klasifikasi Ulang
+      </a>
+      <a href="{{ url_for('index') }}" class="btn btn-hg-outline">
+        <i class="bi bi-house me-2"></i>Kembali ke Beranda
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Animasikan progress bar saat halaman dimuat
+  document.addEventListener('DOMContentLoaded', () => {
+    const bars = document.querySelectorAll('.progress-bar');
+    bars.forEach(bar => {
+      const targetWidth = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => {
+        bar.style.transition = 'width 1s ease-in-out';
+        bar.style.width = targetWidth;
+      }, 200);
+    });
+  });
+</script>
+{% endblock %}

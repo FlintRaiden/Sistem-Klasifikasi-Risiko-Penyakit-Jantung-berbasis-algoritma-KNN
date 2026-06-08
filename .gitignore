@@ -1,0 +1,43 @@
+# ── Virtual Environment ──────────────────────────────────────────────────────
+venv/
+env/
+.env/
+.venv/
+ENV/
+
+# ── Python Cache ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# ── Jupyter Notebook ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Model Files (opsional: hapus # jika tidak ingin push model ke GitHub) ──
+# model/
+
+# ── Environment Variables ─────────────────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ── IDE / Editor ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── OS Files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Flask / Werkzeug ─────────────────────────────────────────────────────────
+instance/
+flask_session/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/

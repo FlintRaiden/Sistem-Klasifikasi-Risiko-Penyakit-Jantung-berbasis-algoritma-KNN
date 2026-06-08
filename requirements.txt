@@ -1,0 +1,17 @@
+# requirements.txt
+# Versi-versi ini kompatibel dengan Python 3.11
+# dan lingkungan Hugging Face Spaces
+
+# Web Framework
+Flask==3.0.3
+Werkzeug==3.0.3
+
+# Machine Learning & Data
+scikit-learn==1.5.1
+pandas==2.2.2
+numpy==1.26.4
+joblib==1.4.2
+
+# Opsional: untuk visualisasi jika diperlukan di analisis
+# matplotlib==3.9.1
+# seaborn==0.13.2
