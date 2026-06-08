@@ -16,6 +16,7 @@ Port: 7860 (kompatibel dengan Hugging Face Spaces)
 import os
 import joblib
 import numpy as np
+import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, session
 
 # ─── Inisialisasi Aplikasi Flask ──────────────────────────────────────────────
@@ -93,8 +94,7 @@ def index():
 def predict():
     """
     GET  → Tampilkan form input data pasien.
-    POST → Baca data form, lakukan prediksi KNN, simpan ke session,
-           redirect ke halaman hasil.
+    POST → Baca data form, lakukan prediksi KNN, dan langsung tampilkan hasil.
     """
     if request.method == "GET":
         return render_template("predict.html")
@@ -134,8 +134,11 @@ def predict():
             float(form_data['thal']),
         ]])
 
+        # ── Konversi ke DataFrame Pandas agar memiliki nama fitur yang sama dengan saat training (mencegah warning) ──
+        input_df = pd.DataFrame(input_values, columns=model_meta['feature_cols'])
+
         # ── Scaling Input ──────────────────────────────────────────────────────
-        input_scaled = scaler.transform(input_values)
+        input_scaled = scaler.transform(input_df)
 
         # ── Prediksi KNN ──────────────────────────────────────────────────────
         prediction    = int(knn_model.predict(input_scaled)[0])
@@ -145,8 +148,8 @@ def predict():
         prob_sehat    = round(float(proba[0]) * 100, 1)
         prob_sakit    = round(float(proba[1]) * 100, 1)
 
-        # ── Simpan Hasil ke Session ───────────────────────────────────────────
-        session['result'] = {
+        # ── Siapkan Hasil ─────────────────────────────────────────────────────
+        result_data = {
             'prediction'   : prediction,
             'label'        : "Terindikasi Sakit Jantung" if prediction == 1 else "Terindikasi Sehat",
             'prob_sehat'   : prob_sehat,
@@ -154,7 +157,11 @@ def predict():
             'input_summary': format_input_summary(form_data),
         }
 
-        return redirect(url_for("result"))
+        # Simpan ke session juga sebagai fallback (jika ada yang mengakses /result secara langsung)
+        session['result'] = result_data
+
+        # Langsung render template hasil tanpa melakukan redirect untuk menghindari masalah cookie/session di iframe Hugging Face
+        return render_template("result.html", result=result_data)
 
     except Exception as e:
         # Jika terjadi error (misal: field kosong), kembali ke form dengan pesan error
