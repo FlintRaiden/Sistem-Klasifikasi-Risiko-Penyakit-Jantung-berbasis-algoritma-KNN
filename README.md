@@ -1,3 +1,12 @@
+---
+title: HeartGuard KNN - Klasifikasi Risiko Penyakit Jantung
+emoji: 💓
+colorFrom: red
+colorTo: pink
+sdk: docker
+pinned: false
+---
+
 # 💓 HeartGuard KNN — Klasifikasi Risiko Penyakit Jantung
 
 Aplikasi web berbasis **Flask** yang menggunakan algoritma **K-Nearest Neighbors (KNN)**
